@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра "Золотые квадраты"</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #FFD700, #FFEC8B);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-description {
+            color: #aaa;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            line-height: 1.5;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            flex-wrap: wrap;
+        }
+        
+        .counter {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4FC3F7;
+        }
+        
+        .counter-value {
+            font-size: 2.2rem;
+            color: #FFD700;
+            margin-left: 8px;
+        }
+        
+        .gold-left {
+            font-size: 1.3rem;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        .gold-left-value {
+            font-size: 1.8rem;
+            margin-left: 8px;
+        }
+        
+        .reset-button {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+        }
+        
+        .reset-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(255, 215, 0, 0.5);
+        }
+        
+        .reset-button:active {
+            transform: translateY(0);
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-gap: 10px;
+            margin: 0 auto;
+            max-width: 600px;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .cell {
+            aspect-ratio: 1;
+            background-color: #555;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0;
+            position: relative;
+        }
+        
+        .cell:hover {
+            transform: scale(1.05);
+        }
+        
+        .cell.closed {
+            background-color: #555;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+        
+        .cell.opened {
+            background-color: #333;
+        }
+        
+        .cell.gold {
+            background-color: #333;
+        }
+        
+        .cell.gold::after {
+            content: "★";
+            color: #FFD700;
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+        
+        .border-normal {
+            border: 3px dashed #4FC3F7;
+        }
+        
+        .border-gold {
+            border: 3px dashed #FFD700;
+        }
+        
+        .border-gold::before {
+            content: "";
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+        }
+        
+        .border-normal::before {
+            content: "";
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+        }
+        
+        .game-status {
+            margin-top: 30px;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.4rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .win-message {
+            color: #4CAF50;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 40px;
+            max-width: 600px;
+        }
+        
+        .instructions h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .instructions ul {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .instructions li:before {
+            content: "•";
+            color: #4FC3F7;
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: -3px;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(6, 1fr);
+                grid-gap: 8px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-board {
+                grid-template-columns: repeat(6, 1fr);
+                grid-gap: 6px;
+                padding: 10px;
+            }
+            
+            .cell {
+                border-radius: 5px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .counter, .gold-left {
+                font-size: 1.2rem;
+            }
+            
+            .counter-value, .gold-left-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Золотые квадраты</h1>
+            <p class="game-description">Найдите все золотые квадраты за минимальное количество кликов. Открывая квадраты, смотрите на цвет рамки — она подскажет, есть ли рядом золотой квадрат.</p>
+        </header>
+        
+        <div class="game-info">
+            <div class="counter">
+                Кликов: <span class="counter-value" id="clickCounter">0</span>
+            </div>
+            <div class="gold-left">
+                Золотых осталось: <span class="gold-left-value" id="goldLeft">4</span>
+            </div>
+            <button class="reset-button" id="resetButton">Новая игра</button>
+        </div>
+        
+        <div class="game-board" id="gameBoard">
+            <!-- Игровое поле будет создано с помощью JavaScript -->
+        </div>
+        
+        <div class="game-status" id="gameStatus">
+            Нажмите на любой квадрат, чтобы начать игру
+        </div>
+        
+        <div class="instructions">
+            <h3>Как играть:</h3>
+            <ul>
+                <li>На поле 6×5 (30 квадратов) спрятаны 4 золотых квадрата.</li>
+                <li>Кликайте на квадраты, чтобы открыть их.</li>
+                <li>Если у открытого квадрата <span style="color:#FFD700">золотая рамка</span> — рядом (сверху, снизу, слева или справа) есть золотой квадрат.</li>
+                <li>Если у открытого квадрата <span style="color:#4FC3F7">синяя рамка</span> — рядом нет золотых квадратов.</li>
+                <li>Цель: найти все золотые квадраты за минимальное количество кликов.</li>
+            </ul>
+        </div>
+        
+        <footer>
+            Игра создана для запуска в браузере. Загрузите на GitHub Pages для доступа онлайн.
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Константы игры
+            const ROWS = 5;
+            const COLS = 6;
+            const GOLD_COUNT = 4;
+            
+            // Состояние игры
+            let gameBoard = [];
+            let goldPositions = [];
+            let clickedCount = 0;
+            let goldFound = 0;
+            let gameOver = false;
+            
+            // Элементы DOM
+            const gameBoardElement = document.getElementById('gameBoard');
+            const clickCounterElement = document.getElementById('clickCounter');
+            const goldLeftElement = document.getElementById('goldLeft');
+            const resetButton = document.getElementById('resetButton');
+            const gameStatusElement = document.getElementById('gameStatus');
+            
+            // Инициализация игры
+            function initGame() {
+                // Сброс состояния
+                gameBoard = [];
+                goldPositions = [];
+                clickedCount = 0;
+                goldFound = 0;
+                gameOver = false;
+                
+                // Обновление UI
+                clickCounterElement.textContent = '0';
+                goldLeftElement.textContent = GOLD_COUNT;
+                gameStatusElement.textContent = 'Найдите все золотые квадраты!';
+                gameStatusElement.classList.remove('win-message');
+                
+                // Очистка игрового поля
+                gameBoardElement.innerHTML = '';
+                
+                // Создание пустого игрового поля
+                for (let row = 0; row < ROWS; row++) {
+                    gameBoard[row] = [];
+                    for (let col = 0; col < COLS; col++) {
+                        gameBoard[row][col] = {
+                            isGold: false,
+                            isRevealed: false
+                        };
+                        
+                        // Создание клетки в DOM
+                        const cell = document.createElement('div');
+                        cell.className = 'cell closed';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        cell.addEventListener('click', () => handleCellClick(row, col));
+                        
+                        gameBoardElement.appendChild(cell);
+                    }
+                }
+                
+                // Размещение золотых квадратов в случайных местах
+                placeGoldSquares();
+            }
+            
+            // Размещение золотых квадратов
+            function placeGoldSquares() {
+                let placed = 0;
+                
+                while (placed < GOLD_COUNT) {
+                    const row = Math.floor(Math.random() * ROWS);
+                    const col = Math.floor(Math.random() * COLS);
+                    
+                    // Проверяем, не является ли клетка уже золотой
+                    if (!gameBoard[row][col].isGold) {
+                        gameBoard[row][col].isGold = true;
+                        goldPositions.push({row, col});
+                        placed++;
+                    }
+                }
+            }
+            
+            // Обработка клика по клетке
+            function handleCellClick(row, col) {
+                // Игнорируем клики, если игра завершена или клетка уже открыта
+                if (gameOver || gameBoard[row][col].isRevealed) {
+                    return;
+                }
+                
+                // Первый клик - начало игры
+                if (clickedCount === 0) {
+                    gameStatusElement.textContent = 'Игра началась! Находите золотые квадраты.';
+                }
+                
+                // Открываем клетку
+                gameBoard[row][col].isRevealed = true;
+                clickedCount++;
+                
+                // Обновляем счетчик кликов
+                clickCounterElement.textContent = clickedCount;
+                
+                // Получаем элемент клетки в DOM
+                const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                
+                // Убираем класс closed и добавляем opened
+                cellElement.classList.remove('closed');
+                cellElement.classList.add('opened');
+                
+                // Проверяем, является ли клетка золотой
+                if (gameBoard[row][col].isGold) {
+                    cellElement.classList.add('gold');
+                    goldFound++;
+                    goldLeftElement.textContent = GOLD_COUNT - goldFound;
+                    
+                    // Проверяем, найдены ли все золотые квадраты
+                    if (goldFound === GOLD_COUNT) {
+                        endGame(true);
+                    }
+                } else {
+                    // Определяем, есть ли рядом золотые квадраты
+                    const hasAdjacentGold = checkAdjacentGold(row, col);
+                    
+                    // Устанавливаем соответствующий стиль рамки
+                    if (hasAdjacentGold) {
+                        cellElement.classList.add('border-gold');
+                    } else {
+                        cellElement.classList.add('border-normal');
+                    }
+                }
+                
+                // Проверяем, не проиграл ли игрок (если кликов больше чем клеток минус золотые)
+                const totalCells = ROWS * COLS;
+                if (clickedCount === totalCells - GOLD_COUNT + goldFound && goldFound < GOLD_COUNT) {
+                    // Открываем все золотые квадраты
+                    revealAllGold();
+                    endGame(false);
+                }
+            }
+            
+            // Проверка соседних клеток на наличие золота
+            function checkAdjacentGold(row, col) {
+                const directions = [
+                    {dr: -1, dc: 0},  // сверху
+                    {dr: 1, dc: 0},   // снизу
+                    {dr: 0, dc: -1},  // слева
+                    {dr: 0, dc: 1}    // справа
+                ];
+                
+                for (const dir of directions) {
+                    const newRow = row + dir.dr;
+                    const newCol = col + dir.dc;
+                    
+                    // Проверяем, находится ли клетка в пределах поля
+                    if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
+                        if (gameBoard[newRow][newCol].isGold) {
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
+            }
+            
+            // Открыть все золотые квадраты (при завершении игры)
+            function revealAllGold() {
+                for (const pos of goldPositions) {
+                    const {row, col} = pos;
+                    
+                    // Если золотой квадрат еще не открыт
+                    if (!gameBoard[row][col].isRevealed) {
+                        gameBoard[row][col].isRevealed = true;
+                        
+                        const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                        cellElement.classList.remove('closed');
+                        cellElement.classList.add('opened', 'gold');
+                    }
+                }
+            }
+            
+            // Завершение игры
+            function endGame(isWin) {
+                gameOver = true;
+                
+                if (isWin) {
+                    gameStatusElement.textContent = `Поздравляем! Вы нашли все золотые квадраты за ${clickedCount} кликов!`;
+                    gameStatusElement.classList.add('win-message');
+                } else {
+                    gameStatusElement.textContent = `Игра окончена! Вы использовали ${clickedCount} кликов. Попробуйте еще раз!`;
+                }
+            }
+            
+            // Обработчик кнопки сброса
+            resetButton.addEventListener('click', initGame);
+            
+            // Инициализация игры при загрузке страницы
+            initGame();
+        });
+    </script>
+</body>
+</html>
