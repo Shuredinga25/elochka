@@ -341,6 +341,7 @@
                 <li>Кликайте на квадраты, чтобы открыть их.</li>
                 <li>Если у открытого квадрата <span style="color:#FFD700">золотая рамка</span> — рядом (сверху, снизу, слева или справа) есть золотой квадрат.</li>
                 <li>Если у открытого квадрата <span style="color:#4FC3F7">синяя рамка</span> — рядом нет золотых квадратов.</li>
+                <li><strong>Важно:</strong> Золотые квадраты тоже могут иметь рамку, если рядом есть другие золотые квадраты!</li>
                 <li>Цель: найти все золотые квадраты за минимальное количество кликов.</li>
             </ul>
         </div>
@@ -463,13 +464,23 @@
                     goldFound++;
                     goldLeftElement.textContent = GOLD_COUNT - goldFound;
                     
+                    // Для золотого квадрата тоже проверяем, есть ли рядом другие золотые
+                    const hasAdjacentGold = checkAdjacentGold(row, col, true);
+                    
+                    // Устанавливаем соответствующую рамку для золотого квадрата
+                    if (hasAdjacentGold) {
+                        cellElement.classList.add('border-gold');
+                    } else {
+                        cellElement.classList.add('border-normal');
+                    }
+                    
                     // Проверяем, найдены ли все золотые квадраты
                     if (goldFound === GOLD_COUNT) {
                         endGame(true);
                     }
                 } else {
-                    // Определяем, есть ли рядом золотые квадраты
-                    const hasAdjacentGold = checkAdjacentGold(row, col);
+                    // Для обычного квадрата проверяем, есть ли рядом золотые
+                    const hasAdjacentGold = checkAdjacentGold(row, col, false);
                     
                     // Устанавливаем соответствующий стиль рамки
                     if (hasAdjacentGold) {
@@ -489,7 +500,9 @@
             }
             
             // Проверка соседних клеток на наличие золота
-            function checkAdjacentGold(row, col) {
+            // Параметр ignoreSelf нужен, чтобы при проверке для золотого квадрата
+            // мы не учитывали его самого
+            function checkAdjacentGold(row, col, ignoreSelf) {
                 const directions = [
                     {dr: -1, dc: 0},  // сверху
                     {dr: 1, dc: 0},   // снизу
@@ -504,6 +517,8 @@
                     // Проверяем, находится ли клетка в пределах поля
                     if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
                         if (gameBoard[newRow][newCol].isGold) {
+                            // Если ignoreSelf = false (обычная клетка) или
+                            // если ignoreSelf = true (золотая клетка), то мы нашли другую золотую клетку
                             return true;
                         }
                     }
@@ -524,6 +539,16 @@
                         const cellElement = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
                         cellElement.classList.remove('closed');
                         cellElement.classList.add('opened', 'gold');
+                        
+                        // Для золотого квадрата тоже проверяем, есть ли рядом другие золотые
+                        const hasAdjacentGold = checkAdjacentGold(row, col, true);
+                        
+                        // Устанавливаем соответствующую рамку
+                        if (hasAdjacentGold) {
+                            cellElement.classList.add('border-gold');
+                        } else {
+                            cellElement.classList.add('border-normal');
+                        }
                     }
                 }
             }
