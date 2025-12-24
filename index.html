@@ -61,15 +61,19 @@
         }
         
         .game-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             background-color: rgba(0, 0, 0, 0.4);
-            padding: 12px 15px;
+            padding: 15px;
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            flex-wrap: wrap;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: nowrap;
             gap: 10px;
         }
         
@@ -78,12 +82,17 @@
             font-weight: bold;
             color: #4FC3F7;
             white-space: nowrap;
+            flex: 1;
+            text-align: center;
         }
         
         .counter-value {
             font-size: clamp(1.3rem, 4vw, 1.8rem);
             color: #FFD700;
             margin-left: 5px;
+            display: inline-block;
+            min-width: 30px;
+            text-align: right;
         }
         
         .gold-left {
@@ -91,27 +100,40 @@
             color: #FFD700;
             font-weight: bold;
             white-space: nowrap;
+            flex: 1;
+            text-align: center;
         }
         
         .gold-left-value {
             font-size: clamp(1.1rem, 3vw, 1.5rem);
             margin-left: 5px;
+            display: inline-block;
+            min-width: 20px;
+            text-align: right;
+        }
+        
+        .button-row {
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
         
         .reset-button {
             background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
             color: #000;
             border: none;
-            padding: 8px 15px;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            padding: 10px 30px;
+            font-size: clamp(1rem, 2.8vw, 1.2rem);
             font-weight: bold;
             border-radius: 40px;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
             white-space: nowrap;
-            min-height: 40px;
+            min-height: 44px;
             touch-action: manipulation;
+            width: auto;
+            min-width: 160px;
         }
         
         .reset-button:active {
@@ -154,7 +176,6 @@
             touch-action: manipulation;
             -webkit-user-select: none;
             user-select: none;
-            /* Ключевое исправление: рамка включается в размер */
             border: 2px solid transparent;
             box-sizing: border-box;
             min-width: 0;
@@ -299,6 +320,10 @@
             .cell.gold::after {
                 font-size: 1.2rem;
             }
+            
+            .stats-row {
+                margin-bottom: 20px;
+            }
         }
         
         /* Для очень маленьких экранов */
@@ -328,6 +353,29 @@
             .cell.gold::after {
                 font-size: 0.8rem;
             }
+            
+            .stats-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .counter, .gold-left {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .reset-button {
+                padding: 8px 25px;
+                min-width: 140px;
+            }
+        }
+        
+        /* Для средних экранов */
+        @media (min-width: 351px) and (max-width: 767px) {
+            .stats-row {
+                justify-content: space-around;
+            }
         }
         
         /* Убедимся, что ничего не выходит за границы */
@@ -347,13 +395,17 @@
         </header>
         
         <div class="game-info">
-            <div class="counter">
-                Кликов: <span class="counter-value" id="clickCounter">0</span>
+            <div class="stats-row">
+                <div class="counter">
+                    Кликов: <span class="counter-value" id="clickCounter">0</span>
+                </div>
+                <div class="gold-left">
+                    Золотых: <span class="gold-left-value" id="goldLeft">4</span>
+                </div>
             </div>
-            <div class="gold-left">
-                Золотых: <span class="gold-left-value" id="goldLeft">4</span>
+            <div class="button-row">
+                <button class="reset-button" id="resetButton">Новая игра</button>
             </div>
-            <button class="reset-button" id="resetButton">Новая игра</button>
         </div>
         
         <div class="game-board-wrapper">
