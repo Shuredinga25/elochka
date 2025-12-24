@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игра "Золотые квадраты"</title>
     <style>
         * {
@@ -10,30 +10,20 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-        }
-        
-        html {
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
         }
         
         body {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #fff;
-            min-height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             padding: 15px;
-            display: block;
-            overflow-x: hidden;
+            min-height: 100vh;
         }
         
         .page-container {
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            padding: 0;
         }
         
         header {
@@ -59,9 +49,6 @@
             font-size: clamp(0.9rem, 3vw, 1rem);
             margin-top: 5px;
             line-height: 1.4;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
         }
         
         .game-info {
@@ -135,7 +122,6 @@
             box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
             white-space: nowrap;
             min-height: 44px;
-            touch-action: manipulation;
             width: auto;
             min-width: 160px;
         }
@@ -164,7 +150,6 @@
             margin: 0 auto;
             aspect-ratio: 6/5;
             max-width: 100%;
-            box-sizing: border-box;
         }
         
         .cell {
@@ -177,13 +162,9 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
-            touch-action: manipulation;
             -webkit-user-select: none;
             user-select: none;
             border: 2px solid transparent;
-            box-sizing: border-box;
-            min-width: 0;
-            min-height: 0;
         }
         
         .cell:active {
@@ -382,14 +363,6 @@
                 justify-content: space-around;
             }
         }
-        
-        /* Убедимся, что ничего не выходит за границы */
-        .game-board-wrapper,
-        .game-status,
-        .instructions,
-        footer {
-            box-sizing: border-box;
-        }
     </style>
 </head>
 <body>
@@ -493,12 +466,8 @@
                         cell.dataset.row = row;
                         cell.dataset.col = col;
                         
-                        // Используем touchend для мобильных устройств
+                        // Обработчик клика
                         cell.addEventListener('click', () => handleCellClick(row, col));
-                        cell.addEventListener('touchend', (e) => {
-                            e.preventDefault();
-                            handleCellClick(row, col);
-                        });
                         
                         gameBoardElement.appendChild(cell);
                     }
@@ -656,20 +625,9 @@
             
             // Обработчик кнопки сброса
             resetButton.addEventListener('click', initGame);
-            resetButton.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                initGame();
-            });
             
             // Инициализация игры при загрузке страницы
             initGame();
-            
-            // Предотвращение стандартного поведения для мобильных устройств
-            document.addEventListener('touchmove', (e) => {
-                if (e.scale !== 1) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
         });
     </script>
 </body>
